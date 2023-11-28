@@ -1,0 +1,17 @@
+<nav class="sticky absolute top-0">
+    <div class="bg-green-500 ">
+        <ul class="flex gap-8 justify-end p-4 pr-28">
+            <li
+                class="{% if page == 'home' %}underline {% else %} hover:underline{% endif %} decoration-2">
+                <a href="{% url 'home_page' %}">Home</a></li>
+
+            <li
+                class="{% if page == 'data' %}underline {% else %} hover:underline{% endif %} decoration-2">
+                <a href="{% url 'data_page' %}">Data</a></li>
+
+            <li
+                class="{% if page == 'plot' %}underline {% else %} hover:underline{% endif %} decoration-2">
+                <a href="{% url 'plot_page' %}">Plot</a></li>
+        </ul>
+    </div>
+</nav>

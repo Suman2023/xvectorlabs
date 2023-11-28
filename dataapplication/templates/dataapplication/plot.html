@@ -1,0 +1,18 @@
+{% extends "dataapplication/index.html" %}
+
+{% block title %}
+Plot
+{% endblock title %}
+
+
+{% block body %}
+{% include "dataapplication/components/header.html" %}
+<h1>This is Plot Screen</h1>
+
+<select class="p-2 rounded-md" name="aggregator" id="aggregator">
+    <option value="" disabled selected>Select Aggregator</option>
+    <option value="min">min</option>
+    <option value="max">max</option>
+    <option value="sum">sum</option>
+</select>
+{% endblock body %}

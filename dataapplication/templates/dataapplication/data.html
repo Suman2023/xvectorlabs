@@ -1,0 +1,45 @@
+{% extends "dataapplication/index.html" %}
+
+{% block title %}
+Data
+{% endblock title %}
+
+
+{% block body %}
+{% include "dataapplication/components/header.html" %}
+
+<div class="flex justify-center">
+    <div>
+        <table>
+            <thead class="sticky top-100">
+                <tr>
+                    <th class="border-2 text-center py-2 px-4">File Name</th>
+                    <th class="border-2 text-center py-2 px-4">Rows Count</th>
+                    <th class="border-2 text-center py-2 px-4">Columns Count</th>
+                    <th class="border-2 text-center py-2 px-4">Uploaded Timestamp</th>
+                </tr>
+            </thead>
+
+            <tbody id="dataset-rows">
+                {% comment %} {% for i in "x"|ljust:1000 %}
+                <tr>
+                    <td class="border-2 text-center py-2 px-4">Row 1, Column 1</td>
+                    <td class="border-2 text-center py-2 px-4">Row 1, Column 2</td>
+                    <td class="border-2 text-center py-2 px-4">Row 1, Column 3</td>
+                    <td class="border-2 text-center py-2 px-4">Row 1, Column 4</td>
+                </tr>
+                {% endfor %} {% endcomment %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<h2 class="flex justify-center">No Data</h2>
+<div class="flex justify-center gap-4 fixed  bottom-0 left-0 right-0 p-4">
+    <form action="" method="post">
+        <input type="file" name="uploadfile" id="" accept=".csv">
+        <input class="rounded-md p-1 border" type="text" name="" id="" placeholder="Enter File Name">
+        <button class="bg-green-500 rounded-md py-1 px-4 mx-2" type="submit">Submit</button>
+    </form>
+</div>
+{% endblock body %}

@@ -1,0 +1,17 @@
+{% extends "dataapplication/index.html" %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block body %}
+{% include "dataapplication/components/header.html" %}
+<h1>Hello There,</h1>
+<p>Welcome to Data Application. We specialize in storing and proving anlytical and graphical respresentation of your
+    large datsets</p>
+<h3>There is only 2 steps</h3>
+<p>First upload your data <a href="{% url 'data_page' %}">here</a>
+</p>
+<p>Now you are ready to use the aggregator and plot your first graphical representation <a href="{% url 'plot_page' %}"
+        class="text-blue-500">here</a></p>
+{% endblock body %}

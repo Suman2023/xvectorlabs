@@ -1,4 +1,6 @@
 __pycache__/
+migrations/
 .venv/
 
 *.sqlite3
+.restAPIs
