@@ -4,7 +4,10 @@
 
 ### This is a part of take home project from xVectorLabs. The project is to create a data application that can be used to store, compute and plot graphs. The data is provided in the form of a csv file.
 
-## NOTE: A Proper internet connection is required to run the project.
+## NOTE: 
+- A Proper internet connection is required to run the project.
+- The plotting and aggregating of data is done taking the first 50 rows of the csv file. This is done to reduce the time taken to load the page. The complete data can be used by changing the value in the api/views.py file.
+
 
 # DEMO
 https://github.com/Suman2023/xvectorlabs/assets/66205793/d88515a0-df43-4b59-89fe-08e9f9c504b3
