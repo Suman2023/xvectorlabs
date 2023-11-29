@@ -36,7 +36,9 @@ Data
     </div>
 
 </div>
+{% if not uploadedfiles %}
 <h2 id="no-data-placeholder" class="flex justify-center">No Data</h2>
+{% endif %}
 
 {% comment %} FOOTER {% endcomment %}
 <div class="flex justify-center gap-4 fixed  bottom-0 left-0 right-0 p-4 bg-green-700">
