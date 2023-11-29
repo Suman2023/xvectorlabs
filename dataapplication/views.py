@@ -1,8 +1,7 @@
 from django.shortcuts import render
 
-# from api.models import UploadedFile
-
-# Create your views here.
+from api.models import UploadedFile
+from api.serializers import UploadedFileSerializer
 
 
 def home(request):
@@ -10,8 +9,20 @@ def home(request):
 
 
 def data(request):
-    return render(request, "dataapplication/data.html", {"page": "data"})
+    query_set = UploadedFile.objects.all()
+    uploadedfiles = UploadedFileSerializer(query_set, many=True).data
+    return render(
+        request,
+        "dataapplication/data.html",
+        {"page": "data", "uploadedfiles": uploadedfiles},
+    )
 
 
 def plot(request):
-    return render(request, "dataapplication/plot.html", {"page": "plot"})
+    query_set = UploadedFile.objects.all()
+    uploaded_files = UploadedFileSerializer(query_set, many=True).data
+    return render(
+        request,
+        "dataapplication/plot.html",
+        {"page": "plot", "uploaded_files": uploaded_files},
+    )

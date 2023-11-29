@@ -8,10 +8,10 @@ Data
 {% block body %}
 {% include "dataapplication/components/header.html" %}
 
-<div class="flex justify-center">
+<div class="flex justify-center mb-16">
     <div>
         <table>
-            <thead class="sticky top-100">
+            <thead class="">
                 <tr>
                     <th class="border-2 text-center py-2 px-4">File Name</th>
                     <th class="border-2 text-center py-2 px-4">Rows Count</th>
@@ -21,25 +21,59 @@ Data
             </thead>
 
             <tbody id="dataset-rows">
-                {% comment %} {% for i in "x"|ljust:1000 %}
+                {% for file in uploadedfiles %}
+
                 <tr>
-                    <td class="border-2 text-center py-2 px-4">Row 1, Column 1</td>
-                    <td class="border-2 text-center py-2 px-4">Row 1, Column 2</td>
-                    <td class="border-2 text-center py-2 px-4">Row 1, Column 3</td>
-                    <td class="border-2 text-center py-2 px-4">Row 1, Column 4</td>
+                    <td class="border-2 text-center py-2 px-4">{{file.filename}}</td>
+                    <td class="border-2 text-center py-2 px-4">{{file.rowscount}}</td>
+                    <td class="border-2 text-center py-2 px-4">{{file.colscount}}</td>
+                    <td class="border-2 text-center py-2 px-4">{{file.uploadtime}}</td>
                 </tr>
-                {% endfor %} {% endcomment %}
+
+                {% endfor %}
             </tbody>
         </table>
     </div>
 
 </div>
-<h2 class="flex justify-center">No Data</h2>
-<div class="flex justify-center gap-4 fixed  bottom-0 left-0 right-0 p-4">
-    <form action="" method="post">
-        <input type="file" name="uploadfile" id="" accept=".csv">
-        <input class="rounded-md p-1 border" type="text" name="" id="" placeholder="Enter File Name">
-        <button class="bg-green-500 rounded-md py-1 px-4 mx-2" type="submit">Submit</button>
+<h2 id="no-data-placeholder" class="flex justify-center">No Data</h2>
+
+{% comment %} FOOTER {% endcomment %}
+<div class="flex justify-center gap-4 fixed  bottom-0 left-0 right-0 p-4 bg-green-700">
+    <form id="dataset-form" method="post">
+        <input type="file" name="datasetfile" accept=".csv" required>
+        <input class="rounded-md p-1 border" type="text" name="filename" placeholder="Enter File Name" required>
+        <button class="bg-green-500 rounded-md py-1 px-4 mx-2" type="submit">Upload</button>
     </form>
 </div>
+
+<script>
+    function createTableRows(data) {
+        var element = document.getElementById("no-data-placeholder");
+        if (element) {
+            element.remove();
+        }
+        const tableBody = document.getElementById('dataset-rows');
+        const row = document.createElement('tr');
+        row.innerHTML =
+            `<td class="border-2 text-center py-2 px-4">${data.filename}</td><td class="border-2 text-center py-2 px-4">${data.rowscount}</td><td class="border-2 text-center py-2 px-4">${data.colscount}</td><td class="border-2 text-center py-2 px-4">${data.uploadtime}</td>`;
+        tableBody.appendChild(row);
+    }
+
+    document.getElementById("dataset-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        fetch("/dataset/", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                createTableRows(data)
+            })
+            .catch(error => {
+                alert("Something went wrong. Please try Again")
+            });
+    });
+</script>
 {% endblock body %}

@@ -7,12 +7,197 @@ Plot
 
 {% block body %}
 {% include "dataapplication/components/header.html" %}
-<h1>This is Plot Screen</h1>
 
-<select class="p-2 rounded-md" name="aggregator" id="aggregator">
-    <option value="" disabled selected>Select Aggregator</option>
-    <option value="min">min</option>
-    <option value="max">max</option>
-    <option value="sum">sum</option>
-</select>
+{% comment %} AGGREGATOR {% endcomment %}
+<form method="post">
+    <div class="flex flex-col gap-8 justify-center mt-8 md:flex-row">
+        <select class="p-2 rounded-md" name="aggregator-dataset" id="aggregator-dataset-selection" required>
+            <option value="" disabled selected>Select File</option>
+            {% for file in uploaded_files %}
+            <option file-id="{{file.id}}" value="{{file.filename}}">{{file.filename}}</option>
+            {% endfor %}
+        </select>
+
+        <input class="border p-2 rounded-md" type="text" name="aggregator-column" id="aggregator-column"
+            placeholder="Enter Column Name" required>
+
+        <select class="p-2 rounded-md" name="aggregator" id="aggregator-selection" required>
+            <option value="" disabled selected>Select Aggregator</option>
+            <option value="min">min</option>
+            <option value="max">max</option>
+            <option value="sum">sum</option>
+        </select>
+
+        <button class="px-4 py-1 rounded-md bg-green-500" onclick="computeAggregation()">Compute</button>
+    </div>
+
+</form>
+<div class="flex justify-center text-2xl mt-4" id="aggregated-value"></div>
+
+
+
+{% comment %} PLOT JS {% endcomment %}
+<div class="flex flex-col gap-8 justify-center mt-16 md:flex-row">
+    <select class="p-2 rounded-md" name="plot-dataset" id="plot-dataset-selection" required>
+        <option value="" disabled selected>Select File</option>
+        {% for file in uploaded_files %}
+        <option file-id="{{file.id}}" value="{{file.filename}}">{{file.filename}}</option>
+        {% endfor %}
+    </select>
+    <input class="border p-2 rounded-md" type="text" name="plot-column-x" id="plot-column-x"
+        placeholder="Enter Column Name" required>
+    <input class="border p-2 rounded-md" type="text" name="plot-column-y" id="plot-column-y"
+        placeholder="Enter Column Name" required>
+    <button class="px-8 py-1 rounded-md bg-green-500" onclick="plotDiagram()">Plot</button>
+</div>
+
+<div id="dataset-plot" class="flex justify-center m-16">
+
+
+
+</div>
+
+
+
+
+<script>
+    function computeAggregation() {
+        event.preventDefault();
+
+        // FILE SELECTION
+        var selectElement = document.getElementById('aggregator-dataset-selection');
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var selectedValue = selectedOption.value;
+        var selectedId = selectedOption.getAttribute('file-id');
+
+        // COLUMN NAME
+        columnInput = document.getElementById("aggregator-column")
+        selectedColumn = columnInput.value
+
+        // AGGREGATOR SELECTION
+        var selectElement = document.getElementById('aggregator-selection');
+        var selectedAggregator = selectElement.value;
+
+        if (!(selectedColumn && selectedAggregator && selectedId)) {
+            document.getElementById("aggregated-value").innerHTML =
+                `<p class="text-sm text-red-500"> Please Select Valid File , Column and Aggregator </p>`
+            return;
+        }
+
+        // COMPUTE AGGREGATION
+        data = {
+                "column": selectedColumn,
+                "aggregator": selectedAggregator
+            },
+            fetch(`dataset/${selectedId}/compute`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    response.json().then((data) => {
+                        document.getElementById("aggregated-value").innerHTML =
+                            `<p class="text-sm text-red-500"> ${data.message} </p>`
+                    })
+                }
+            })
+            .then((data) => {
+                document.getElementById("aggregated-value").innerHTML =
+                    `<h2>${selectedColumn} has a ${selectedAggregator} value of: <b class="mr-2 text-green-600 text-3xl"> ${data.result} </b></h2>`
+            })
+            .catch((error) => {
+                document.getElementById("aggregated-value").innerHTML =
+                    `<p class="text-sm text-red-500"> Something went Wrong. Please try again! </p>`
+                console.log(error)
+            });
+    }
+
+
+    function plotDiagram() {
+        event.preventDefault();
+
+        // FILE SELECTION
+        var selectElement = document.getElementById('plot-dataset-selection');
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var selectedValue = selectedOption.value;
+        var selectedId = selectedOption.getAttribute('file-id');
+
+        // COLUMN NAME X
+        columnInput = document.getElementById("plot-column-x")
+        selectedColumnX = columnInput.value
+
+        // COLUMN NAME Y
+        columnInput = document.getElementById("plot-column-y")
+        selectedColumnY = columnInput.value
+
+        if (!(selectedColumnX && selectedColumnY && selectedId)) {
+            document.getElementById("dataset-plot").innerHTML =
+                `<p class="text-sm text-red-500"> Please Select Valid File , Column and Aggregator </p>`
+            return;
+        }
+
+        data = {
+                "columnx": selectedColumnX,
+                "columny": selectedColumnY
+            },
+            fetch(`dataset/${selectedId}/plot`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    response.json().then((data) => {
+                        document.getElementById("aggregated-value").innerHTML =
+                            `<p class="text-sm text-red-500"> ${data.message} </p>`
+                    })
+                }
+            })
+            .then((data) => {
+                plotDiv = document.getElementById("dataset-plot")
+                var dataset1 = {
+                    x: data.x,
+                    y: data.y,
+                    mode: 'markers',
+                    type: 'scatter'
+
+                };
+
+                var layout = {
+                    width: 800,
+                    height: 540,
+                    xaxis: {
+                        title: selectedColumnX
+                    },
+                    yaxis: {
+                        title: selectedColumnY
+                    }
+                };
+
+                var data = [dataset1];
+                Plotly.newPlot(plotDiv, data, layout);
+            })
+            .catch((error) => {
+                response.json().then((data) => {
+                    document.getElementById("aggregated-value").innerHTML =
+                        `<p class="text-sm text-red-500">Something went Wrong. Please try again! </p>`
+                })
+                console.log(error)
+            });
+
+
+    }
+</script>
+
+
+
 {% endblock body %}

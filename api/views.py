@@ -38,7 +38,8 @@ def get_or_upload_datasets(request):
             colscount=num_cols,
         )
         new_file.save()
-        return Response({"message": "Success"}, status=status.HTTP_201_CREATED)
+        serializer = UploadedFileSerializer(new_file)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])
@@ -50,28 +51,50 @@ def compute(request, id):
             {"message": "No dataset found for the provided id"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+    try:
+        dataset = BytesIO(query_object.uploadfile)
+        df = pd.read_csv(dataset)
+        column = json_data.get("column")
+        aggregator = json_data.get("aggregator")
+        response = None
 
-    dataset = BytesIO(query_object.uploadfile)
-    df = pd.read_csv(dataset)
-    column = json_data.get("column")
-    aggregator = json_data.get("aggregator")
-    response = None
-    if aggregator == "min":
-        response = df[column].min()
-    elif aggregator == "max":
-        response = df[column].max()
-    elif aggregator == "sum":
-        response = df[column].sum()
-    else:
+        if not pd.api.types.is_numeric_dtype(df[column]):
+            raise TypeError("Selected Column is not of type Numeric")
+
+        if aggregator == "min":
+            response = df[column].min()
+        elif aggregator == "max":
+            response = df[column].max()
+        elif aggregator == "sum":
+            response = df[column].sum()
+        else:
+            return Response(
+                {"message": "Only min, max and sum can be passed as aggregator"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+    except KeyError:
         return Response(
-            {"message": "Only min, max and sum can be passed as aggregator"},
+            {"message": "Invalid Column Name"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except pd.errors.EmptyDataError:
+        return Response(
+            {"message": "File Corrupted"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except TypeError as e:
+        return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception:
+        return Response(
+            {"message": "Something went Wrong. Please try again!"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
     return Response({"result": response}, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def plot(request, id):
     json_data = json.loads(request.body)
     query_object = UploadedFile.objects.filter(id=id).first()
@@ -81,12 +104,32 @@ def plot(request, id):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    column1 = json_data.get("column1")
-    column2 = json_data.get("column2")
-    dataset = BytesIO(query_object.uploadfile)
-    df = pd.read_csv(dataset)
+    column1 = json_data.get("columnx")
+    column2 = json_data.get("columny")
+    try:
+        dataset = BytesIO(query_object.uploadfile)
+        df = pd.read_csv(dataset)
 
-    x = df[column1][:30]
-    y = df[column2][:30]
+        x = df[column1][:50]
+        y = df[column2][:50]
+
+    except KeyError:
+        return Response(
+            {"message": "Invalid Column Name"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except pd.errors.EmptyDataError:
+        return Response(
+            {"message": "File Corrupted"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except TypeError as e:
+        return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception:
+        return Response(
+            {"message": "Something went Wrong. Please try again!"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     return Response({"x": x, "y": y}, status=status.HTTP_200_OK)
