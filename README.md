@@ -6,6 +6,9 @@
 
 ## NOTE: A Proper internet connection is required to run the project.
 
+# DEMO
+https://github.com/Suman2023/xvectorlabs/assets/66205793/d88515a0-df43-4b59-89fe-08e9f9c504b3
+
 ## Requirements
 
 ### The project is written in python 3.11. The following packages are required to run the project:
