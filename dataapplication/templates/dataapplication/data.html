@@ -45,7 +45,7 @@ Data
     <form id="dataset-form" method="post">
         <input type="file" name="datasetfile" accept=".csv" required>
         <input class="rounded-md p-1 border" type="text" name="filename" placeholder="Enter File Name" required>
-        <button class="bg-green-500 rounded-md py-1 px-4 mx-2" type="submit">Upload</button>
+        <button id="upload-button" class="bg-green-500 rounded-md py-1 px-4 mx-2" type="submit">Upload</button>
     </form>
 </div>
 
@@ -64,6 +64,9 @@ Data
 
     document.getElementById("dataset-form").addEventListener("submit", function (event) {
         event.preventDefault();
+        uploadbutton = document.getElementById("upload-button");
+        uploadbutton.innerHTML = 'Uploading...';
+        uploadbutton.disabled = true;
         const formData = new FormData(this);
         fetch("/dataset/", {
                 method: "POST",
@@ -71,10 +74,16 @@ Data
             })
             .then(response => response.json())
             .then(data => {
-                createTableRows(data)
+                createTableRows(data);
+                uploadbutton.innerHTML = 'Upload';
+                uploadbutton.disabled = false;
+                
+
             })
             .catch(error => {
                 alert("Something went wrong. Please try Again")
+                uploadbutton.innerHTML = 'Upload';
+                uploadbutton.disabled = false;
             });
     });
 </script>
