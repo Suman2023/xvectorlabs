@@ -1,5 +1,23 @@
 # A Data Application Project
 
+## UPDATES:
+
+<details>
+
+<summary>Update 2.0</summary>
+
+### Now the csv file is converted to tables in postgres
+
+### There are couple of changes in views.py to handle the creation of dyanmic table. This is acheived by using Django connection cursor fron django.db
+
+# Results
+### Everything is working with a major disadvantage being that uploading file takes a lot of time.
+### For example the given csv file takes about 15 seconds to upload and form the table in postgres (tested using Github Workspace and Postgres Docker running on Digital Ocean).
+### This is mainly for the simple pandas functionlity used with for loops. This can be optimized i guess need to reserach further.
+
+</details>
+
+
 ## Introduction
 
 ### This is a part of take home project from xVectorLabs. The project is to create a data application that can be used to store, compute and plot graphs. The data is provided in the form of a csv file.
