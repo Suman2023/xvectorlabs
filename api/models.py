@@ -9,3 +9,4 @@ class UploadedFile(models.Model):
     rowscount = models.IntegerField()
     colscount = models.IntegerField()
     uploadtime = models.DateTimeField(auto_now_add=True)
+    tablename = models.TextField(default="")
