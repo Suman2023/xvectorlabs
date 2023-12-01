@@ -104,13 +104,20 @@ def get_or_upload_datasets(request):
 
 
 def is_column_numeric(tablename,columnname):
+    # For Sqlite
+    # with connection.cursor() as cursor:
+    #     cursor.execute(f"PRAGMA table_info({tablename})")
+    #     columns_and_dtype = cursor.fetchall()
+    #     for column in columns_and_dtype:
+    #         if column[1] == columnname:
+    #             return column[2] == 'NUMERIC'
+    #     return False
+
+    # For Postgres
     with connection.cursor() as cursor:
-        cursor.execute(f"PRAGMA table_info({tablename})")
-        columns_and_dtype = cursor.fetchall()
-        for column in columns_and_dtype:
-            if column[1] == columnname:
-                return column[2] == 'NUMERIC'
-        return False
+        cursor.execute(f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='{tablename}' AND column_name='{columnname}'")
+        data = cursor.fetchone()[1]
+        return data == 'numeric'
 
 
 @api_view(["POST"])
